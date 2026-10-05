@@ -36,8 +36,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
-          {/* On phones, lift toasts above the bottom nav + home indicator so they never cover it. */}
-          <Toaster position="bottom-right" mobileOffset={{ bottom: "calc(env(safe-area-inset-bottom) + 84px)", left: 12, right: 12 }} richColors closeButton />
+          {/* On phones, lift toasts above the bottom nav and the home indicator so they never cover it. */}
+          <Toaster position="bottom-right" mobileOffset={{ bottom: "calc(env(safe-area-inset-bottom) + 76px)", left: 12, right: 12 }} richColors closeButton />
         </ThemeProvider>
         <RegisterServiceWorker />
       </body>

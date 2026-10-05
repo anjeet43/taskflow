@@ -1,5 +1,6 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useProfile } from "@/lib/use-profile";
 import { PageHeader, type SortKey } from "@/components/layout/page-header";
 import { TaskList } from "@/components/tasks/task-list";
 import { EmptyState } from "@/components/empty-state";
@@ -11,6 +12,13 @@ import { format } from "date-fns";
 export default function TodayPage() {
   const { tasks } = useWorkspace();
   const [sort, setSort] = useState<SortKey>("manual");
+  const { firstName } = useProfile();
+  // Computed after mount so the server render and the browser never disagree about the hour.
+  const [greeting, setGreeting] = useState("Hello");
+  useEffect(() => {
+    const h = new Date().getHours();
+    setGreeting(h >= 5 && h < 12 ? "Good morning" : h >= 12 && h < 17 ? "Good afternoon" : "Good evening");
+  }, []);
   const todayStr = new Date().toISOString().slice(0, 10);
 
   const { dueToday, overdue, completedToday } = useMemo(() => {
@@ -28,7 +36,7 @@ export default function TodayPage() {
     <div>
       <PageHeader title="Today" subtitle={format(new Date(), "EEEE, MMMM d")} sort={sort} onSortChange={setSort} />
       <div className="mx-auto max-w-2xl px-5 py-6 md:px-8">
-        <h2 className="mb-1 text-xl font-semibold">Good day 👋</h2>
+        <h2 className="mb-1 break-words text-xl font-semibold">{greeting}{firstName ? `, ${firstName}` : ""} 👋</h2>
         <p className="mb-6 text-sm text-muted">
           {remaining === 0 ? "You have no tasks left for today." : `You have ${remaining} task${remaining === 1 ? "" : "s"} remaining today.`}
           {completedToday > 0 && ` · ${completedToday} completed`}

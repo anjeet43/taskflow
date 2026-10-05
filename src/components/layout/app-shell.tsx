@@ -17,7 +17,7 @@ export function AppShell({
       {/* h-dvh = the *visible* viewport on iOS Safari (100vh includes the collapsing URL bar and gets cut off). */}
       <div className="flex h-screen h-dvh overflow-hidden bg-bg">
         <Sidebar />
-        <main className="min-w-0 flex-1 overflow-y-auto pb-[calc(5.25rem+env(safe-area-inset-bottom))] md:pb-0">
+        <main className="min-w-0 flex-1 overflow-y-auto pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
           <OfflineBanner />
           {children}
         </main>

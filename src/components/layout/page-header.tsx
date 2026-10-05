@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Plus, ArrowUpDown, Search, Command } from "lucide-react";
+import { Plus, ArrowUpDown, Search } from "lucide-react";
+import { UserMenu } from "@/components/layout/user-menu";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { useWorkspace } from "@/components/workspace-context";
 
@@ -9,7 +10,7 @@ export type SortKey = "manual" | "due" | "priority" | "created";
 export function PageHeader({
   title, subtitle, sort, onSortChange,
 }: { title: string; subtitle?: string; sort?: SortKey; onSortChange?: (s: SortKey) => void }) {
-  const { setQuickAddOpen, setSearchOpen, setPaletteOpen } = useWorkspace();
+  const { setQuickAddOpen, setSearchOpen } = useWorkspace();
   return (
     <div className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-border bg-bg/80 px-5 py-4 backdrop-blur max-md:px-4 max-md:pb-3 max-md:pt-[calc(0.75rem+env(safe-area-inset-top))] md:px-8">
       <div className="min-w-0">
@@ -17,12 +18,9 @@ export function PageHeader({
         {subtitle && <p className="truncate text-sm text-muted">{subtitle}</p>}
       </div>
       <div className="flex shrink-0 items-center gap-1.5 md:gap-2">
-        {/* Phone-only entry points for search + command palette (⌘K and "/" need a physical keyboard). */}
+        {/* Phone-only search button ("/" needs a physical keyboard). The command palette is in the avatar menu. */}
         <Button variant="ghost" size="icon" className="h-10 w-10 md:hidden" aria-label="Search" onClick={() => setSearchOpen(true)}>
           <Search className="h-[18px] w-[18px]" />
-        </Button>
-        <Button variant="ghost" size="icon" className="h-10 w-10 md:hidden" aria-label="Command palette" onClick={() => setPaletteOpen(true)}>
-          <Command className="h-[18px] w-[18px]" />
         </Button>
         {onSortChange && (
           <DropdownMenu>
@@ -42,6 +40,7 @@ export function PageHeader({
         )}
         {/* On phones the bottom-nav "+" button does this, so the text button is desktop/tablet only. */}
         <Button size="sm" className="max-md:hidden" onClick={() => setQuickAddOpen(true)}><Plus className="h-4 w-4" /> Add task</Button>
+        <UserMenu />
       </div>
     </div>
   );

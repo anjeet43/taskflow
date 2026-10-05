@@ -4,6 +4,9 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { useProfile } from "@/lib/use-profile";
 import { SunMedium, Moon, Monitor, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { InstallCard } from "@/components/pwa/install-card";
@@ -13,6 +16,22 @@ export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const [email, setEmail] = useState<string | null>(null);
   const router = useRouter();
+  const { savedName, name } = useProfile();
+  const [displayName, setDisplayName] = useState("");
+  const [savingName, setSavingName] = useState(false);
+  // Pre-fill once the profile has loaded (and again after a successful save).
+  useEffect(() => { setDisplayName(savedName || name); }, [savedName, name]);
+
+  async function saveName() {
+    const value = displayName.trim().slice(0, 50);
+    if (!value) return;
+    if (!navigator.onLine) { toast.error("You're offline. Name not saved."); return; }
+    setSavingName(true);
+    const { error } = await createClient().auth.updateUser({ data: { display_name: value } });
+    setSavingName(false);
+    if (error) toast.error(error.message);
+    else toast.success("Name updated");
+  }
 
   async function signOut() {
     await createClient().auth.signOut();
@@ -33,6 +52,20 @@ export default function SettingsPage() {
           <div className="rounded-xl border border-border bg-surface p-4">
             <p className="text-sm text-muted">Signed in as</p>
             <p className="break-all text-sm font-medium">{email ?? "…"}</p>
+            <label htmlFor="display-name" className="mt-4 block text-sm text-muted">Your name</label>
+            <div className="mt-1 flex gap-2">
+              <Input
+                id="display-name"
+                value={displayName}
+                maxLength={50}
+                autoComplete="given-name"
+                placeholder="How should we greet you?"
+                onChange={(e) => setDisplayName(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") saveName(); }}
+                className="max-md:h-11"
+              />
+              <Button size="sm" onClick={saveName} disabled={savingName || !displayName.trim()} className="max-md:h-11">{savingName ? "Saving…" : "Save"}</Button>
+            </div>
             <Button variant="outline" size="sm" onClick={signOut} className="mt-3 max-md:h-11"><LogOut className="h-4 w-4" /> Sign out</Button>
           </div>
         </section>
