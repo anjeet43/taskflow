@@ -41,3 +41,12 @@ body { background: rgb(var(--bg)); color: rgb(var(--ink)); font-feature-settings
   100% { background-color: transparent; }
 }
 .task-complete-flash { animation: task-complete-flash 600ms ease-out; }
+
+/* ---------- Mobile / PWA hardening ---------- */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: transparent; }
+a, button, [role="button"], label { touch-action: manipulation; }
+/* iOS Safari zooms the page when an input is focused with font-size < 16px. Keep inputs at 16px on phones. */
+@media (max-width: 767px) {
+  input, select, textarea { font-size: 16px !important; }
+}

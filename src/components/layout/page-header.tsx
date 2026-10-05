@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Plus, ArrowUpDown } from "lucide-react";
+import { Plus, ArrowUpDown, Search, Command } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { useWorkspace } from "@/components/workspace-context";
 
@@ -9,18 +9,27 @@ export type SortKey = "manual" | "due" | "priority" | "created";
 export function PageHeader({
   title, subtitle, sort, onSortChange,
 }: { title: string; subtitle?: string; sort?: SortKey; onSortChange?: (s: SortKey) => void }) {
-  const { setQuickAddOpen } = useWorkspace();
+  const { setQuickAddOpen, setSearchOpen, setPaletteOpen } = useWorkspace();
   return (
-    <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-bg/80 px-5 py-4 backdrop-blur md:px-8">
-      <div>
-        <h1 className="text-lg font-semibold text-ink">{title}</h1>
-        {subtitle && <p className="text-sm text-muted">{subtitle}</p>}
+    <div className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-border bg-bg/80 px-5 py-4 backdrop-blur max-md:px-4 max-md:pb-3 max-md:pt-[calc(0.75rem+env(safe-area-inset-top))] md:px-8">
+      <div className="min-w-0">
+        <h1 className="truncate text-lg font-semibold text-ink">{title}</h1>
+        {subtitle && <p className="truncate text-sm text-muted">{subtitle}</p>}
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-1.5 md:gap-2">
+        {/* Phone-only entry points for search + command palette (⌘K and "/" need a physical keyboard). */}
+        <Button variant="ghost" size="icon" className="h-10 w-10 md:hidden" aria-label="Search" onClick={() => setSearchOpen(true)}>
+          <Search className="h-[18px] w-[18px]" />
+        </Button>
+        <Button variant="ghost" size="icon" className="h-10 w-10 md:hidden" aria-label="Command palette" onClick={() => setPaletteOpen(true)}>
+          <Command className="h-[18px] w-[18px]" />
+        </Button>
         {onSortChange && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm"><ArrowUpDown className="h-3.5 w-3.5" /> Sort</Button>
+              <Button variant="outline" size="sm" className="max-md:h-10 max-md:w-10 max-md:px-0" aria-label="Sort tasks">
+                <ArrowUpDown className="h-3.5 w-3.5" /> <span className="max-md:sr-only">Sort</span>
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Sort by</DropdownMenuLabel>
@@ -31,7 +40,8 @@ export function PageHeader({
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-        <Button size="sm" onClick={() => setQuickAddOpen(true)}><Plus className="h-4 w-4" /> Add task</Button>
+        {/* On phones the bottom-nav "+" button does this, so the text button is desktop/tablet only. */}
+        <Button size="sm" className="max-md:hidden" onClick={() => setQuickAddOpen(true)}><Plus className="h-4 w-4" /> Add task</Button>
       </div>
     </div>
   );

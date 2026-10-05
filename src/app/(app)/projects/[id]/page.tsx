@@ -39,16 +39,16 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
   return (
     <div>
       <PageHeader title={project.name} subtitle={`${projectTasks.length} open task${projectTasks.length === 1 ? "" : "s"}`} sort={sort} onSortChange={setSort} />
-      <div className="mx-auto max-w-2xl px-5 py-6 md:px-8">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+      <div className="mx-auto max-w-2xl px-4 py-6 sm:px-5 md:px-8">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-2">
             <span className="h-3 w-3 rounded-full" style={{ backgroundColor: project.color }} />
-            {project.description && <p className="text-sm text-muted">{project.description}</p>}
+            {project.description && <p className="min-w-0 break-words text-sm text-muted">{project.description}</p>}
           </div>
           <div className="flex gap-1">
-            <Button variant="secondary" size="sm" onClick={() => openQuickAdd(project.id)}><Plus className="h-4 w-4" /> Add task</Button>
-            <Button variant="ghost" size="icon" onClick={() => setEditOpen(true)}><Pencil className="h-4 w-4" /></Button>
-            <Button variant="ghost" size="icon" onClick={onDelete}><Trash2 className="h-4 w-4 text-danger" /></Button>
+            <Button variant="secondary" size="sm" className="max-md:h-10" onClick={() => openQuickAdd(project.id)}><Plus className="h-4 w-4" /> Add task</Button>
+            <Button variant="ghost" size="icon" aria-label="Edit project" className="max-md:h-10 max-md:w-10" onClick={() => setEditOpen(true)}><Pencil className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="icon" aria-label="Delete project" className="max-md:h-10 max-md:w-10" onClick={onDelete}><Trash2 className="h-4 w-4 text-danger" /></Button>
           </div>
         </div>
         <TaskList

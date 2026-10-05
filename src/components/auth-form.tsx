@@ -75,8 +75,8 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
       </div>
 
       <form onSubmit={onSubmit} className="space-y-3">
-        <Input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus />
-        <Input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
+        <Input type="email" inputMode="email" autoComplete="email" autoCapitalize="none" autoCorrect="off" aria-label="Email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus className="max-md:h-11" />
+        <Input type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} aria-label="Password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="max-md:h-11" />
         <Button type="submit" className="w-full" disabled={!!loading}>
           {loading === "password" && <Loader2 className="h-4 w-4 animate-spin" />}
           {mode === "login" ? "Sign in" : "Sign up"}

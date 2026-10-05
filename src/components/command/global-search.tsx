@@ -34,7 +34,7 @@ export function GlobalSearch() {
       open={searchOpen}
       onOpenChange={(v) => { setSearchOpen(v); if (!v) setQuery(""); }}
       label="Search tasks"
-      className="fixed left-1/2 top-[18%] z-50 w-[92vw] max-w-lg -translate-x-1/2 overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl animate-slide-up"
+      className="fixed left-1/2 top-[18%] z-50 w-[92vw] max-w-lg -translate-x-1/2 overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl animate-slide-up max-md:left-3 max-md:right-3 max-md:top-[calc(env(safe-area-inset-top)+0.75rem)] max-md:w-auto max-md:max-w-none max-md:translate-x-0"
     >
       <div className="flex items-center gap-2 border-b border-border px-3">
         <SearchIcon className="h-4 w-4 text-muted" />
@@ -45,13 +45,13 @@ export function GlobalSearch() {
           className="h-12 w-full bg-transparent text-sm text-ink outline-none placeholder:text-muted"
         />
       </div>
-      <Command.List className="max-h-80 overflow-y-auto p-2">
+      <Command.List className="max-h-80 overflow-y-auto overscroll-contain p-2 max-md:max-h-[42dvh]">
         <Command.Empty className="py-6 text-center text-sm text-muted">No matching tasks.</Command.Empty>
         {results.map((t) => (
           <Command.Item
             key={t.id}
             onSelect={() => { setSearchOpen(false); router.push(t.project_id ? `/projects/${t.project_id}` : "/inbox"); }}
-            className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-ink aria-selected:bg-surface-2"
+            className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-ink aria-selected:bg-surface-2 max-md:min-h-11"
           >
             <CircleDot className={`h-3.5 w-3.5 shrink-0 ${t.completed ? "text-ok" : "text-muted"}`} />
             <span className={`flex-1 truncate ${t.completed ? "line-through text-muted" : ""}`}>{t.title}</span>

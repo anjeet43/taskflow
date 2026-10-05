@@ -30,6 +30,10 @@ export function QuickAddDialog() {
     e.preventDefault();
     const title = parsed.title || text.trim();
     if (!title) return;
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      toast.error("You're offline. This task was not saved.");
+      return;
+    }
     setSaving(true);
     try {
       const tagIds = await resolveTagIds(parsed.tagNames);

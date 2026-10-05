@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { format, isPast, isToday } from "date-fns";
-import { GripVertical, Flag, ChevronDown, ChevronRight, Copy, Trash2, MoreHorizontal, FolderInput } from "lucide-react";
+import { GripVertical, Flag, ChevronDown, ChevronRight, Copy, Trash2, MoreHorizontal, FolderInput, ArrowUp, ArrowDown } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from "@/components/ui/dropdown-menu";
@@ -15,7 +15,9 @@ import { toast } from "sonner";
 
 const PRIORITY_COLOR: Record<string, string> = { high: "text-danger", medium: "text-warn", low: "text-ok", none: "text-transparent" };
 
-export function TaskItem({ task, showProject }: { task: Task; showProject?: boolean }) {
+export function TaskItem({
+  task, showProject, onMove, isFirst, isLast,
+}: { task: Task; showProject?: boolean; onMove?: (dir: -1 | 1) => void; isFirst?: boolean; isLast?: boolean }) {
   const { toggleComplete, removeTask, projects } = useWorkspace();
   const [open, setOpen] = useState(false);
   const [flash, setFlash] = useState(false);
@@ -40,24 +42,26 @@ export function TaskItem({ task, showProject }: { task: Task; showProject?: bool
       style={{ transform: CSS.Transform.toString(transform), transition }}
       className={cn("group rounded-xl", isDragging && "opacity-50", flash && "task-complete-flash")}
     >
-      <div className="flex items-start gap-2 px-2 py-2.5">
-        <button {...attributes} {...listeners} className="mt-1 cursor-grab touch-none text-border opacity-0 group-hover:opacity-100 active:cursor-grabbing">
+      <div className="flex items-start gap-2 px-2 py-2.5 max-md:gap-0.5 max-md:py-0.5">
+        <button {...attributes} {...listeners} aria-label="Drag to reorder" className="mt-1 cursor-grab touch-none text-border opacity-0 group-hover:opacity-100 focus-visible:opacity-100 active:cursor-grabbing [@media(hover:none)]:hidden">
           <GripVertical className="h-4 w-4" />
         </button>
 
         {subtasks.length > 0 ? (
-          <button onClick={() => setOpen((v) => !v)} className="mt-0.5 text-muted">
+          <button onClick={() => setOpen((v) => !v)} aria-label={open ? "Hide subtasks" : "Show subtasks"} aria-expanded={open} className="mt-0.5 flex items-center justify-center text-muted max-md:mt-0 max-md:h-11 max-md:w-8">
             {open ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
           </button>
         ) : (
-          <span className="w-3.5" />
+          <span className="w-3.5 max-md:w-1" />
         )}
 
-        <Checkbox checked={task.completed} onCheckedChange={onToggle} priority={task.priority} className="mt-0.5" />
+        <label htmlFor={`task-${task.id}`} className="mt-0.5 flex shrink-0 max-md:mt-0 max-md:h-11 max-md:w-11 max-md:items-center max-md:justify-center">
+          <Checkbox id={`task-${task.id}`} aria-label={`Mark "${task.title}" ${task.completed ? "incomplete" : "complete"}`} checked={task.completed} onCheckedChange={onToggle} priority={task.priority} />
+        </label>
 
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 max-md:pb-2 max-md:pt-3">
           <div className="flex items-center gap-2">
-            <span className={cn("truncate text-sm", task.completed && "text-muted line-through")}>{task.title}</span>
+            <span className={cn("truncate text-sm max-md:text-[15px]", task.completed && "text-muted line-through")}>{task.title}</span>
             {task.priority !== "none" && <Flag className={cn("h-3 w-3 shrink-0", PRIORITY_COLOR[task.priority])} fill="currentColor" />}
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-1.5">
@@ -78,15 +82,22 @@ export function TaskItem({ task, showProject }: { task: Task; showProject?: bool
         </div>
 
         <DropdownMenu>
-          <DropdownMenuTrigger className="rounded-lg p-1 text-muted opacity-0 group-hover:opacity-100 hover:bg-surface-2 hover:text-ink">
-            <MoreHorizontal className="h-4 w-4" />
+          <DropdownMenuTrigger aria-label={`Actions for ${task.title}`} className="rounded-lg p-1 text-muted opacity-0 group-hover:opacity-100 hover:bg-surface-2 hover:text-ink focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 data-[state=open]:opacity-100 [@media(hover:none)]:opacity-100 max-md:flex max-md:h-11 max-md:w-11 max-md:items-center max-md:justify-center">
+            <MoreHorizontal className="h-4 w-4 max-md:h-5 max-md:w-5" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
+            {onMove && (
+              <>
+                <DropdownMenuItem disabled={isFirst} onSelect={() => onMove(-1)}><ArrowUp className="h-3.5 w-3.5" /> Move up</DropdownMenuItem>
+                <DropdownMenuItem disabled={isLast} onSelect={() => onMove(1)}><ArrowDown className="h-3.5 w-3.5" /> Move down</DropdownMenuItem>
+                <DropdownMenuSeparator />
+              </>
+            )}
             <DropdownMenuItem onSelect={async () => { await duplicateTask(task.id); toast.success("Task duplicated"); }}>
               <Copy className="h-3.5 w-3.5" /> Duplicate
             </DropdownMenuItem>
             <DropdownMenuSub>
-              <DropdownMenuSubTrigger className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm text-ink outline-none focus:bg-surface-2">
+              <DropdownMenuSubTrigger className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-1.5 text-sm text-ink outline-none focus:bg-surface-2 max-md:min-h-11 max-md:py-2.5">
                 <FolderInput className="h-3.5 w-3.5" /> Move to…
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent>
@@ -105,12 +116,12 @@ export function TaskItem({ task, showProject }: { task: Task; showProject?: bool
       </div>
 
       {open && subtasks.length > 0 && (
-        <div className="ml-10 space-y-0.5 border-l border-border pl-3">
+        <div className="ml-10 space-y-0.5 border-l border-border pl-3 max-md:ml-8">
           {subtasks.map((s) => (
-            <div key={s.id} className="flex items-center gap-2 py-1.5">
-              <Checkbox checked={s.completed} onCheckedChange={() => toggleComplete(s)} priority={s.priority} />
-              <span className={cn("text-sm", s.completed && "text-muted line-through")}>{s.title}</span>
-            </div>
+            <label key={s.id} htmlFor={`task-${s.id}`} className="flex cursor-pointer items-center gap-2 py-1.5 max-md:min-h-11 max-md:py-2.5">
+              <Checkbox id={`task-${s.id}`} checked={s.completed} onCheckedChange={() => toggleComplete(s)} priority={s.priority} />
+              <span className={cn("min-w-0 break-words text-sm", s.completed && "text-muted line-through")}>{s.title}</span>
+            </label>
           ))}
         </div>
       )}
