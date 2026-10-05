@@ -42,15 +42,15 @@ export function MobileNav() {
     <>
       <nav
         aria-label="Primary"
-        className="fixed inset-x-0 bottom-0 z-30 flex items-end border-t border-border bg-surface/95 px-1 pb-[env(safe-area-inset-bottom,0px)] backdrop-blur md:hidden"
+        className="fixed inset-x-0 bottom-0 z-30 flex items-stretch border-t border-border bg-surface/95 px-1 pb-[env(safe-area-inset-bottom,0px)] backdrop-blur md:hidden"
       >
         {TABS.slice(0, 2).map(({ href, label, icon: Icon }) => (
           <Tab key={href} href={href} label={label} Icon={Icon} active={pathname === href} />
         ))}
-        <div className="flex w-14 shrink-0 justify-center pb-2">
+        <div className="flex h-14 w-16 shrink-0 items-center justify-center">
           <button
             onClick={() => setQuickAddOpen(true)}
-            className="-mt-5 flex h-12 w-12 items-center justify-center rounded-full bg-accent text-accent-ink shadow-lg transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+            className="flex h-12 w-12 -translate-y-3 items-center justify-center rounded-full bg-accent text-accent-ink shadow-lg ring-4 ring-surface transition-transform active:-translate-y-3 active:scale-95 focus-visible:outline-none focus-visible:ring-accent/50"
             aria-label="Add task"
           >
             <Plus className="h-6 w-6" />
@@ -64,7 +64,7 @@ export function MobileNav() {
           aria-label="More"
           aria-haspopup="dialog"
           className={cn(
-            "flex min-h-[52px] min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-1 text-[11px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
+            "flex h-14 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-0 text-[10px] leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
             moreActive ? "text-accent" : "text-muted"
           )}
         >
@@ -127,12 +127,12 @@ function Tab({ href, label, Icon, active }: { href: string; label: string; Icon:
       href={href}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "flex min-h-[52px] min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-1 text-[11px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
+        "flex h-14 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-0 text-[10px] leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
         active ? "text-accent" : "text-muted"
       )}
     >
       <Icon className="h-5 w-5" />
-      <span className="max-w-full truncate">{label}</span>
+      <span className="whitespace-nowrap">{label}</span>
     </Link>
   );
 }
